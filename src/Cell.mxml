@@ -1,59 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
-		 xmlns:s="library://ns.adobe.com/flex/spark" 
-		 xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%" xmlns:local="*"
-		 creationComplete="init()" >
-
+<s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				   xmlns:s="library://ns.adobe.com/flex/spark" 
+				   xmlns:mx="library://ns.adobe.com/flex/mx" 
+				   width="100%"
+				   height="100%"
+				   minHeight="20"
+				   click="caseListener(event)"
+				   mouseUp="dropListener(event)"
+				   creationComplete="init()">
+	
 	<fx:Script>
 		<![CDATA[
-			import mx.collections.ArrayList;
-			import mx.controls.Alert;
+			import mx.controls.Label;
+			import mx.events.FlexEvent;
 			
-			private var cases:ArrayList = new ArrayList();
-				
-			public function init():void {
+			protected function init():void
+			{
 				//Context menu
 				var cellMenu:ContextMenu = new ContextMenu();
 				var splitItem:ContextMenuItem= new ContextMenuItem("Split");
 				cellMenu.customItems.push(splitItem);	
 				splitItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, splitListener);
 				contextMenu = cellMenu;
-				
-				addCase();
 			}
 			
-			public function addCase():void
+			public function add(str:String):void
 			{
-				var c:Case = new Case();
-				addElement(c);
-				cases.addItem(c);
+				var label:Label = new Label();
+				label.addEventListener(MouseEvent.MOUSE_DOWN, dragListener);
+				label.text = str;
+				
+				this["content"].addElement(label);
+			}
+			
+			public function caseListener(event:MouseEvent):void
+			{
+				this.add(new String("lmmlmlmlml"));
+			}
+			
+			public function dragListener(event:MouseEvent):void
+			{
+				var label:Label = Label(event.currentTarget);
+				Table.label = label;
+				Table.casee = this;
+				Table.start = new Point(event.localX, event.localY);
+			}
+			
+			public function dropListener(event:MouseEvent):void
+			{
+				if (Table.drag) {
+					add(Table.label.text);
+				}
+			}
+			
+			public function removeLabel(label:Label):void {
+				this["content"].removeElement(label);
 			}
 			
 			public function splitListener(e:ContextMenuEvent):void
 			{
-				addCase();
-			}		
-			
-			public function reduce():void
-			{
-				for each (var c:Case in cases.source) {
-					c.height = 20;
-				}
-			}
-			
-			public function expand():void
-			{
-				for each (var c:Case in cases.source) {
-					c.percentHeight = 100;
-				}
-			}
+				Node(this.parent.parent).split();
+			}			
 		]]>
 	</fx:Script>
 	
-	<s:layout>
-		<s:VerticalLayout 
-			gap="0"
-			variableRowHeight="true"
-			/>
-	</s:layout>
-</s:Group>
+	<s:Scroller width="100%" height="100%">
+		<s:Group
+			id="content"
+			horizontalScrollPosition="0" 
+			verticalScrollPosition="0"> 
+			
+			<s:layout>
+				<s:VerticalLayout 
+					gap="0"
+					horizontalAlign="left"
+					paddingBottom="0"
+					paddingLeft="0"
+					paddingRight="0"
+					paddingTop="0"
+					variableRowHeight="true"
+					verticalAlign="top"
+					/>
+			</s:layout>
+		</s:Group>                 
+	</s:Scroller>
+	
+</s:BorderContainer>

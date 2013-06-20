@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 width="100%" height="100%" xmlns:local="*">
+	
+	<s:layout>
+		<s:HorizontalLayout gap="0" verticalAlign="contentJustify"/>
+	</s:layout>
+	
+	<local:Cell id="cell"></local:Cell>
+	<s:Group id="subNodes" height="100%">
+		<s:layout>
+			<s:VerticalLayout gap="0" variableRowHeight="true"/>
+		</s:layout>
+	</s:Group>
+</s:Group>

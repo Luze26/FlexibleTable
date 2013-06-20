@@ -5,27 +5,25 @@
 					   mouseMove="moveListener(event)"
 					   mouseUp="mouseUpListener(event)">
 	<fx:Script>
-		<![CDATA[
-			import mx.collections.ArrayList;
+		<![CDATA[			
+			import mx.events.FlexEvent;
 			
 			import spark.layouts.VerticalLayout;
-			
-			private var list:ArrayList = new ArrayList();
 
+			
 			protected function newRow_clickHandler(event:MouseEvent):void
 			{
-				var ligne:Ligne = new Ligne();
+				if(Table.getNbCol() == 0) {
+					Table.incNbCol();
+				}
 				
-				lignes.addElement(ligne);
-				list.addItem(ligne);
+				this["rootNode"].addSubNode();
 			}
 			
 			protected function newCol_clickHandler(event:MouseEvent):void
 			{
 				Table.incNbCol();
-				for each (var ligne:Ligne in list.source) {
-					ligne.addCell();
-				}
+				this["rootNode"].changeNbCol();
 			}
 			
 			protected function moveListener(event:MouseEvent):void
@@ -48,24 +46,9 @@
 	</fx:Script>
 	
 	
-	<s:Group width="100%" layout="{new VerticalLayout()}">	
+	<s:Group width="100%" height="100%" layout="{new VerticalLayout()}">	
 		<mx:Button label="Insert a new row" click="newRow_clickHandler(event)"></mx:Button>
 		<mx:Button label="Add column" click="newCol_clickHandler(event)"></mx:Button>
-		
-
-		<s:Group id="lignes" width="100%">
-			<s:layout>
-				<s:VerticalLayout 
-					gap="0"
-					horizontalAlign="left"
-					paddingBottom="0"
-					paddingLeft="0"
-					paddingRight="0"
-					paddingTop="0"
-					variableRowHeight="true"
-					verticalAlign="top"
-					/>
-			</s:layout>
-		</s:Group>
+		<local:Node id="rootNode"></local:Node>
 	</s:Group>
 </s:WindowedApplication>
