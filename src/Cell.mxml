@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%" xmlns:local="*"
+		 creationComplete="init()" >
+
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayList;
+			import mx.controls.Alert;
+			
+			private var cases:ArrayList = new ArrayList();
+				
+			public function init():void {
+				//Context menu
+				var cellMenu:ContextMenu = new ContextMenu();
+				var splitItem:ContextMenuItem= new ContextMenuItem("Split");
+				cellMenu.customItems.push(splitItem);	
+				splitItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, splitListener);
+				contextMenu = cellMenu;
+				
+				addCase();
+			}
+			
+			public function addCase():void
+			{
+				var c:Case = new Case();
+				addElement(c);
+				cases.addItem(c);
+			}
+			
+			public function splitListener(e:ContextMenuEvent):void
+			{
+				addCase();
+			}		
+			
+			public function reduce():void
+			{
+				for each (var c:Case in cases.source) {
+					c.height = 20;
+				}
+			}
+			
+			public function expand():void
+			{
+				for each (var c:Case in cases.source) {
+					c.percentHeight = 100;
+				}
+			}
+		]]>
+	</fx:Script>
+	
+	<s:layout>
+		<s:VerticalLayout 
+			gap="0"
+			variableRowHeight="true"
+			/>
+	</s:layout>
+</s:Group>

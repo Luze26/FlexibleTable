@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					   xmlns:s="library://ns.adobe.com/flex/spark" 
+					   xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:local="*"
+					   mouseMove="moveListener(event)"
+					   mouseUp="mouseUpListener(event)">
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayList;
+			
+			import spark.layouts.VerticalLayout;
+			
+			private var list:ArrayList = new ArrayList();
+
+			protected function newRow_clickHandler(event:MouseEvent):void
+			{
+				var ligne:Ligne = new Ligne();
+				
+				lignes.addElement(ligne);
+				list.addItem(ligne);
+			}
+			
+			protected function newCol_clickHandler(event:MouseEvent):void
+			{
+				Table.incNbCol();
+				for each (var ligne:Ligne in list.source) {
+					ligne.addCell();
+				}
+			}
+			
+			protected function moveListener(event:MouseEvent):void
+			{
+				if (! Table.drag && Table.start != null) {
+					if (Math.abs(event.localX - Table.start.x) + Math.abs(event.localY - Table.start.y) > 10) {
+						Table.drag = true;
+						Table.casee.removeLabel(Table.label);
+					}
+				}
+			}
+			
+			protected function mouseUpListener(event:MouseEvent):void
+			{
+				Table.drag = false;
+				Table.start = null;
+			}
+			
+		]]>
+	</fx:Script>
+	
+	
+	<s:Group width="100%" layout="{new VerticalLayout()}">	
+		<mx:Button label="Insert a new row" click="newRow_clickHandler(event)"></mx:Button>
+		<mx:Button label="Add column" click="newCol_clickHandler(event)"></mx:Button>
+		
+
+		<s:Group id="lignes" width="100%">
+			<s:layout>
+				<s:VerticalLayout 
+					gap="0"
+					horizontalAlign="left"
+					paddingBottom="0"
+					paddingLeft="0"
+					paddingRight="0"
+					paddingTop="0"
+					variableRowHeight="true"
+					verticalAlign="top"
+					/>
+			</s:layout>
+		</s:Group>
+	</s:Group>
+</s:WindowedApplication>

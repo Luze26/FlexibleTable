@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 width="100%"
+		 height="100%"
+		 minHeight="20"
+		 maxHeight="100"
+		 click="caseListener(event)"
+		 mouseUp="dropListener(event)">
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.controls.Label;
+			
+			public function add(str:String):void
+			{
+				var label:Label = new Label();
+				label.addEventListener(MouseEvent.MOUSE_DOWN, dragListener);
+				label.text = str;
+				
+				this["content"].addElement(label);
+			}
+			
+			public function caseListener(event:MouseEvent):void
+			{
+				this.add(new String("lmmlmlmlml"));
+			}
+			
+			public function dragListener(event:MouseEvent):void
+			{
+				var label:Label = Label(event.currentTarget);
+				Table.label = label;
+				Table.casee = this;
+				Table.start = new Point(event.localX, event.localY);
+			}
+			
+			public function dropListener(event:MouseEvent):void
+			{
+				if (Table.drag) {
+					add(Table.label.text);
+				}
+			}
+			
+			public function removeLabel(label:Label):void {
+				this["content"].removeElement(label);
+			}
+		]]>
+	</fx:Script>
+	
+	<s:Scroller width="100%" height="100%">
+		<s:Group
+			id="content"
+			horizontalScrollPosition="0" 
+			verticalScrollPosition="0"> 
+			
+			<s:layout>
+				<s:VerticalLayout 
+					gap="0"
+					horizontalAlign="left"
+					paddingBottom="0"
+					paddingLeft="0"
+					paddingRight="0"
+					paddingTop="0"
+					variableRowHeight="true"
+					verticalAlign="top"
+					/>
+			</s:layout>
+		</s:Group>                 
+	</s:Scroller>
+	
+</s:BorderContainer>
