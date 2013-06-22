@@ -10,8 +10,14 @@ package
 		
 		public static var label:Label;
 		public static var start:Point = null;
+		
 		public static var drag:Boolean = false;
-		public static var casee:Cell;
+		public static var resize:Boolean = false;
+		
+		public static var cell:Cell;
+		public static var indexResize:int;
+		
+		public static var rootNode:Node;
 		
 		public static function getNbCol():Number
 		{

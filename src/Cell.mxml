@@ -3,34 +3,48 @@
 				   xmlns:s="library://ns.adobe.com/flex/spark" 
 				   xmlns:mx="library://ns.adobe.com/flex/mx" 
 				   width="100%"
-				   height="100%"
-				   minHeight="20"
 				   click="caseListener(event)"
 				   mouseUp="dropListener(event)"
+				   mouseDown="resizeListener(event)"
 				   creationComplete="init()">
 	
 	<fx:Script>
 		<![CDATA[
+			import mx.controls.Alert;
 			import mx.controls.Label;
 			import mx.events.FlexEvent;
 			
+			public var parentNode:Node = null;
+				
 			protected function init():void
 			{
+				this["content"].minHeight = Config.MIN_HEIGHT;
+				
 				//Context menu
 				var cellMenu:ContextMenu = new ContextMenu();
 				var splitItem:ContextMenuItem= new ContextMenuItem("Split");
 				cellMenu.customItems.push(splitItem);	
 				splitItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, splitListener);
 				contextMenu = cellMenu;
+				
+				parentNode = Node(this.parent.parent);
 			}
 			
 			public function add(str:String):void
 			{
 				var label:Label = new Label();
+				var size:int = this.height;
 				label.addEventListener(MouseEvent.MOUSE_DOWN, dragListener);
 				label.text = str;
-				
+
 				this["content"].addElement(label);
+				this.validateNow();
+				
+				var newSize:int = this.measuredHeight;
+				if (newSize > size) {
+					this.height = newSize;
+					parentNode.propagate(newSize - size);
+				}
 			}
 			
 			public function caseListener(event:MouseEvent):void
@@ -42,28 +56,55 @@
 			{
 				var label:Label = Label(event.currentTarget);
 				Table.label = label;
-				Table.casee = this;
+				Table.cell = this;
 				Table.start = new Point(event.localX, event.localY);
+			}
+			
+			public function resizeListener(event:MouseEvent):void
+			{
+				var x:int = event.localX;
+				if (x < Config.RESIZE_BORDER) {
+					Table.resize = true;
+					Table.start = localToGlobal(new Point(event.localX, event.localY));
+					Table.indexResize = parentNode.index - 1;
+				}
+				else if (x > this.width  - Config.RESIZE_BORDER) {
+					Table.resize = true;
+					Table.start = localToGlobal(new Point(event.localX, event.localY));
+					Table.indexResize = parentNode.index;
+				}
 			}
 			
 			public function dropListener(event:MouseEvent):void
 			{
-				if (Table.drag) {
+				if (Table.drag && !Table.resize) {
 					add(Table.label.text);
 				}
 			}
 			
-			public function removeLabel(label:Label):void {
-				this["content"].removeElement(label);
+			public function remove(obj:Object):void {
+				var size:int = this.height;
+				this["content"].removeElement(obj);		
+				this.validateNow();
+				
+				var newSize:int = parentNode.maxHeightNode();
+				if (newSize > Config.MIN_HEIGHT) {
+					this.minHeight = newSize;
+					this.height = newSize;
+				}
+
+				if (newSize < size) {
+					parentNode.propagateSize(newSize - size);
+				}
 			}
 			
 			public function splitListener(e:ContextMenuEvent):void
 			{
-				Node(this.parent.parent).split();
+				parentNode.split();
 			}			
 		]]>
 	</fx:Script>
-	
+
 	<s:Scroller width="100%" height="100%">
 		<s:Group
 			id="content"

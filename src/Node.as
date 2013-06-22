@@ -9,7 +9,7 @@ package
 	{
 		private var view:NodeView = new NodeView();
 		private var subNodes:ArrayList = new ArrayList();
-		private var index:int;
+		public var index:int;
 		
 		public function Node(index:int=0):void
 		{
@@ -58,6 +58,10 @@ package
 		{
 			var next:Node = new Node(index+1);
 			next.percentWidth = 100;
+			
+			if (index > 0 && subNodes.length == 0) {
+				next.percentHeight = 100;
+			}
 
 			if (i == -1) {
 				view.subNodes.addElement(next);
@@ -67,12 +71,68 @@ package
 			}
 
 			subNodes.addItem(next);
+
 		}
 		
 		public function split():void
 		{
 			var group:Group = Group(this.parent);
 			Node(group.parent.parent).addSubNode();
+		}
+		
+		public function propagate(size:int):void
+		{
+			if (subNodes.length > 0) {
+				var s:int = size / subNodes.length;
+
+				for each (var node2:Node in subNodes.source) {
+					node2.propagateSize(s);
+				}
+			}
+		}
+		
+		public function propagateSize(size:int):void
+		{
+			var newSize:int = view.cell.height + size;
+			if (newSize > view.cell.minHeight && newSize < view.cell.maxHeight) {
+				view.cell.height = newSize;
+			}
+			propagate(size);
+		}
+		
+		public function  maxHeightNode():int
+		{
+			var max:int, tmp:int=0;
+			
+			for each (var node2:Node in subNodes.source) {
+				tmp += node2.maxHeightNode();
+			}
+			
+			max = tmp;
+			var cellH:int = view["cell"]["content"].measuredHeight;
+			if (cellH > max) {
+				max = cellH;
+			}
+			return max + 5;
+		}
+		
+		public function resizeCol(index:int, percent:int, first:Boolean):void
+		{
+			if(index == this.index && subNodes.length > 0) {
+				view.cell.percentWidth -= percent;
+				view.subNodes.percentWidth += percent;
+			}
+			
+			if(first) {
+				if(index == this.index) {
+					index++;
+					percent = - percent;
+					first = false;
+				}
+				for each (var node2:Node in subNodes.source) {
+					node2.resizeCol(index, percent, first);
+				}
+			}
 		}
 	}
 }

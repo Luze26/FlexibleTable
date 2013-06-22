@@ -3,13 +3,18 @@
 					   xmlns:s="library://ns.adobe.com/flex/spark" 
 					   xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:local="*"
 					   mouseMove="moveListener(event)"
-					   mouseUp="mouseUpListener(event)">
+					   mouseUp="mouseUpListener(event)"
+					   creationComplete="init()">
 	<fx:Script>
 		<![CDATA[			
-			import mx.events.FlexEvent;
+			import mx.controls.Alert;
 			
 			import spark.layouts.VerticalLayout;
 
+			protected function init():void
+			{
+				Table.rootNode = this["rootNode"];
+			}
 			
 			protected function newRow_clickHandler(event:MouseEvent):void
 			{
@@ -29,9 +34,20 @@
 			protected function moveListener(event:MouseEvent):void
 			{
 				if (! Table.drag && Table.start != null) {
-					if (Math.abs(event.localX - Table.start.x) + Math.abs(event.localY - Table.start.y) > 10) {
+					if (Math.abs(event.localX - Table.start.x) + Math.abs(event.localY - Table.start.y) > Config.DRAG_DISTANCE) {
 						Table.drag = true;
-						Table.casee.removeLabel(Table.label);
+						if (!Table.resize) {
+							Table.cell.remove(Table.label);
+						}
+					}
+				}
+				else if (Table.drag && Table.resize && Table.indexResize > 0) {
+					var xy:Point = event.target.localToGlobal(new Point(event.localX, event.localY));
+					var deplacement:int = Table.start.x - xy.x;
+					var percent:int = deplacement / rootNode.width * 100;
+					if(Math.abs(percent) > Config.RESIZE_THRESHOLD) {
+						Table.start = xy;
+						rootNode.resizeCol(Table.indexResize, percent, true);
 					}
 				}
 			}
@@ -39,6 +55,7 @@
 			protected function mouseUpListener(event:MouseEvent):void
 			{
 				Table.drag = false;
+				Table.resize = false;
 				Table.start = null;
 			}
 			
